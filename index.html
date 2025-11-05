@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tint Tap</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="overlay" id="start-screen">
+      <div class="panel">
+        <h1 class="logo">Tint Tap</h1>
+        <p class="tagline">신중하게 다른 색을 찾아라!</p>
+        <button id="start-button" class="button primary">Start Game</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="gameover-screen">
+      <div class="panel">
+        <h2>Game Over</h2>
+        <p id="final-score"></p>
+        <p id="high-score"></p>
+        <button id="restart-button" class="button">Restart</button>
+      </div>
+    </div>
+
+    <main class="game-shell">
+      <header class="hud">
+        <div class="hud-item">Level: <span id="level-display">1</span></div>
+        <div class="hud-item">Score: <span id="score-display">0</span></div>
+        <div class="hud-item">Lives: <span id="lives-display">3</span></div>
+        <div class="hud-item">Timer: <span id="timer-display">0.0s</span></div>
+        <div class="hud-item">Best: <span id="best-display">0</span></div>
+      </header>
+
+      <section id="message" class="message" aria-live="polite"></section>
+
+      <section class="playfield">
+        <div id="grid" class="tile-grid" role="grid"></div>
+      </section>
+
+      <footer class="controls">
+        <button id="ok-button" class="button confirm">OK</button>
+      </footer>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
