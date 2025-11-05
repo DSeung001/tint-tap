@@ -1,0 +1,50 @@
+{
+  "levels": {
+    "maxLevel": 40,
+    "lives": 3
+  },
+  "scoring": {
+    "basePerLevel": 120,
+    "levelIncrement": 12,
+    "perOddTileBonus": 80,
+    "timeBonus": {
+      "enabled": true,
+      "perSecond": 6,
+      "cap": 240
+    },
+    "wrongPenalty": 0
+  },
+  "deltaSchedule": [
+    { "range": [1, 5], "start": 100, "end": 85, "easing": "linear" },
+    { "range": [6, 10], "start": 85, "end": 70, "easing": "linear" },
+    { "range": [11, 20], "start": 70, "end": 30, "easing": "linear" },
+    { "range": [21, 30], "start": 30, "end": 20, "easing": "linear" },
+    { "range": [31, 40], "start": 20, "end": 10, "easing": "linear" }
+  ],
+  "oddTileSchedule": [
+    { "range": [1, 20], "count": 1 },
+    { "range": [21, 30], "count": 2 },
+    { "range": [31, 35], "count": 3 },
+    { "range": [36, 40], "count": 4 }
+  ],
+  "gridSchedule": [
+    { "range": [1, 5], "cols": 3, "rows": 3 },
+    { "range": [6, 10], "cols": 4, "rows": 3 },
+    { "range": [11, 20], "cols": 4, "rows": 4 },
+    { "range": [21, 30], "cols": 5, "rows": 5 },
+    { "range": [31, 40], "cols": 6, "rows": 5 }
+  ],
+  "timing": {
+    "bonusClockPerLevelSec": 30,
+    "tickHz": 8
+  },
+  "color": {
+    "baseLumaClamp": [50, 200],
+    "channelsToVary": "auto",
+    "colorBlindSafe": false
+  },
+  "ui": {
+    "retro": true,
+    "confirmCommit": false
+  }
+}
