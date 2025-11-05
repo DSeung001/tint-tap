@@ -234,148 +234,215 @@
 
 ## 4. 프로젝트 구조 및 레이어 (Project Structure & Layers)
 
-### 4.1 폴더 구조
+### 4.1 현재 폴더 구조
 
 ```
 tint-tap/
-├── public/                    # 정적 파일
-│   ├── index.html
-│   └── assets/               # 이미지, 폰트, 오디오
-│       ├── fonts/
-│       ├── images/
-│       └── sounds/
+├── index.html
+├── config.json
+├── style.css
 │
-├── src/                      # 소스 코드
-│   ├── main.js               # 진입점
+├── src/
+│   ├── main.js              # 진입점 (초기화 및 부트스트랩)
+│   ├── game.js              # 게임 메인 클래스 (조율자 역할)
+│   │                        # - 게임 상태 전환 관리
+│   │                        # - 타일 선택 및 답안 판정
+│   │                        # - 목숨 관리
 │   │
-│   ├── core/                 # 핵심 게임 로직 레이어
-│   │   ├── GameEngine.js     # 게임 엔진 메인 클래스
-│   │   ├── GameState.js      # 게임 상태 관리 (START, PLAY, JUDGE, GAME_OVER)
-│   │   ├── LevelManager.js   # 레벨 관리 및 난이도 계산
-│   │   ├── ScoringSystem.js  # 점수 계산 로직
-│   │   └── LifeManager.js    # 목숨 관리
+│   ├── managers/            # 관리자 레이어
+│   │   ├── StorageManager.js    # LocalStorage 관리
+│   │   │                        # - loadBestScore()
+│   │   │                        # - updateBestScore()
+│   │   │
+│   │   └── TimerManager.js      # 타이머 관리
+│   │                            # - start(), update(), clear()
+│   │                            # - getElapsedSeconds()
+│   │                            # - getRemainingSeconds()
+│   │                            # - formatSeconds()
 │   │
-│   ├── scenes/               # 게임 씬 레이어
-│   │   ├── BaseScene.js      # 씬 기본 클래스
-│   │   ├── TitleScene.js     # 타이틀 화면 (REQ-001)
-│   │   ├── GameScene.js      # 게임 플레이 씬 (REQ-002, REQ-003, REQ-004)
-│   │   └── GameOverScene.js  # 게임 종료 화면 (REQ-007)
+│   ├── systems/             # 게임 시스템 레이어
+│   │   ├── ScoringSystem.js     # 점수 계산 로직
+│   │   │                        # - calculateBaseScore()
+│   │   │                        # - calculateOddBonus()
+│   │   │                        # - calculateTimeBonus()
+│   │   │                        # - calculateLevelScore()
+│   │   │                        # - calculateWrongPenalty()
+│   │   │
+│   │   └── LevelLoader.js       # 레벨 로딩 및 그리드 생성
+│   │                            # - loadLevel()
+│   │                            # - pickOddIndices()
+│   │                            # - createTileGrid()
 │   │
-│   ├── components/           # UI 컴포넌트 레이어
-│   │   ├── Tile.js           # 타일 컴포넌트
-│   │   ├── Button.js          # 버튼 컴포넌트
-│   │   ├── HUD.js             # 게임 상태 표시 (레벨, 점수, 목숨, 타이머)
-│   │   └── Grid.js            # 그리드 컨테이너
+│   ├── ui/                  # UI 관리 레이어
+│   │   └── HUDManager.js        # HUD 업데이트
+│   │                            # - update()
+│   │                            # - updateGameOver()
 │   │
-│   ├── managers/             # 관리자 레이어
-│   │   ├── ConfigManager.js  # config.json 로드 및 관리
-│   │   ├── AudioManager.js   # 오디오 재생 관리 (Howler.js)
-│   │   ├── StorageManager.js # LocalStorage 관리
-│   │   └── InputManager.js   # 입력 처리 (마우스/터치)
-│   │
-│   ├── utils/                # 유틸리티 레이어
-│   │   ├── color.js          # 색상 생성 및 조작 (REQ-010)
-│   │   ├── math.js           # 수학 함수 (보간, easing)
-│   │   ├── levelUtils.js     # 레벨 계산 함수 (deltaFor, oddCountFor, gridFor)
-│   │   └── scoring.js        # 점수 계산 유틸리티
-│   │
-│   ├── config/               # 설정 레이어
-│   │   └── config.json       # 게임 설정 파일
-│   │
-│   └── styles/               # 스타일 레이어
-│       └── retro.css         # 레트로 스타일 CSS (REQ-011)
-│
-├── package.json
-├── vite.config.js
-├── .gitignore
-├── README.md
-├── plan.md                  # AI 코딩 계획서 (이 문서)
-└── PROGRESS.md              # 진행 상황 추적 파일
+│   ├── config.js            # 설정 파일 로드
+│   ├── difficulty.js        # 난이도 계산 함수
+│   └── color.js             # 색상 생성 알고리즘
 ```
 
-### 4.2 레이어별 책임 (Layer Responsibilities)
+### 4.2 분리된 모듈의 장점
 
-#### 4.2.1 Core Layer (핵심 게임 로직)
-- **목적**: 게임의 핵심 비즈니스 로직
-- **책임**:
-  - 게임 상태 전환 관리
-  - 레벨 난이도 계산
-  - 점수 및 목숨 관리
-  - 게임 규칙 적용
-- **의존성**: `utils/`, `managers/ConfigManager.js`
-- **독립성**: 다른 레이어에 의존하지 않음 (최상위)
+1. **StorageManager.js**
+   - LocalStorage 관련 로직을 독립적으로 관리
+   - 다른 저장소(IndexedDB, 서버 등)로 전환 시 유연성 확보
+   - 테스트 용이성 향상
 
-#### 4.2.2 Scenes Layer (게임 씬)
-- **목적**: 화면별 게임 로직 및 렌더링
-- **책임**:
-  - 각 화면의 상태 관리
-  - PixiJS 컨테이너 관리
-  - 씬 전환 처리
-- **의존성**: `core/`, `components/`, `managers/`
+2. **TimerManager.js**
+   - 타이머 관련 로직을 캡슐화
+   - `formatSeconds` 같은 유틸리티 함수 분리
+   - 타이머 로직 변경 시 영향 범위 최소화
 
-#### 4.2.3 Components Layer (UI 컴포넌트)
-- **목적**: 재사용 가능한 UI 요소
-- **책임**:
-  - PixiJS 기반 시각적 요소 렌더링
-  - 사용자 인터랙션 처리
-  - 상태 표시
-- **의존성**: `managers/InputManager.js`, `utils/`
+3. **ScoringSystem.js**
+   - 점수 계산 로직을 순수 함수로 분리
+   - 점수 계산 규칙 변경 시 테스트 및 수정 용이
+   - 재사용 가능한 점수 계산 유틸리티
 
-#### 4.2.4 Managers Layer (관리자)
-- **목적**: 시스템 리소스 및 외부 라이브러리 관리
-- **책임**:
-  - 설정 파일 로드
-  - 오디오 재생
-  - 데이터 저장/로드
-  - 입력 처리
-- **의존성**: 외부 라이브러리 (PixiJS, Howler.js)
+4. **LevelLoader.js**
+   - 레벨 로딩 및 그리드 생성 로직 분리
+   - DOM 조작 로직을 별도로 관리
+   - 다른 렌더링 방식(Canvas, WebGL)으로 전환 시 유연성 확보
 
-#### 4.2.5 Utils Layer (유틸리티)
-- **목적**: 순수 함수 및 헬퍼 함수
+5. **HUDManager.js**
+   - UI 업데이트 로직을 중앙화
+   - HUD 표시 방식 변경 시 영향 범위 최소화
+   - 재사용 가능한 HUD 컴포넌트 기반 마련
+
+### 4.3 레이어별 책임 (Layer Responsibilities)
+
+#### 4.3.1 게임 메인 클래스 (game.js)
+- **목적**: 게임의 전체 흐름 조율 및 상태 관리
 - **책임**:
-  - 색상 계산
-  - 수학 연산
-  - 레벨 계산
-  - 점수 계산
+  - 게임 상태 전환 관리 (시작 화면, 게임 플레이, 게임 종료)
+  - DOM 요소 캐싱 및 이벤트 바인딩
+  - 타일 선택 및 답안 판정
+  - 목숨 관리
+  - 분리된 모듈들을 조율하여 게임 흐름 제어
+- **의존성**: `managers/`, `systems/`, `ui/`, `config.js`
+
+#### 4.3.2 관리자 레이어 (managers/)
+- **StorageManager.js**: LocalStorage 관리 (최고 점수 저장/로드)
+- **TimerManager.js**: 타이머 관리 및 시간 포맷팅
+- **의존성**: `config.js` (TimerManager만)
+
+#### 4.3.3 시스템 레이어 (systems/)
+- **ScoringSystem.js**: 점수 계산 로직 (순수 함수)
+- **LevelLoader.js**: 레벨 로딩 및 그리드 생성 (DOM 조작)
+- **의존성**: `difficulty.js`, `color.js` (LevelLoader만)
+
+#### 4.3.4 UI 레이어 (ui/)
+- **HUDManager.js**: HUD 업데이트 및 게임 종료 화면 업데이트
+- **의존성**: `managers/TimerManager.js` (formatSeconds 사용)
+
+#### 4.3.5 설정 관리 (config.js)
+- **목적**: 게임 설정 파일 로드 및 관리
+- **책임**:
+  - `config.json` 파일 로드 및 캐싱
+  - 수학 유틸리티 함수 (linearInterpolate)
+- **의존성**: 없음 (외부 API만 사용)
+
+#### 4.3.6 난이도 계산 (difficulty.js)
+- **목적**: 레벨별 난이도 파라미터 계산
+- **책임**:
+  - `deltaFor()`: 레벨별 색상 차이값 계산
+  - `oddCountFor()`: 레벨별 다른 색 타일 개수 계산
+  - `gridFor()`: 레벨별 그리드 크기 계산
+- **의존성**: `config.js` (설정 스케줄 참조)
+- **특징**: 순수 함수로 구성되어 테스트 용이
+
+#### 4.3.7 색상 생성 (color.js)
+- **목적**: 색상 생성 및 조작
+- **책임**:
+  - `randomBaseColor()`: 기본 색상 랜덤 생성 (밝기 클램프 적용)
+  - `oddColorFrom()`: Δ 기반 다른 색 생성
+  - `toCssColor()`: RGB 객체를 CSS 색상 문자열로 변환
 - **의존성**: 없음 (순수 함수)
+- **특징**: 비즈니스 로직과 독립적인 유틸리티
 
-#### 4.2.6 Config Layer (설정)
-- **목적**: 게임 설정 데이터
-- **책임**: 설정 값 정의
-- **의존성**: 없음
+#### 4.3.8 HTML/CSS 구조
+- **index.html**: 게임 UI 구조 정의
+- **style.css**: 레트로 스타일 적용
+- **config.json**: 게임 설정 데이터 (난이도, 점수, 타이밍 등)
 
-### 4.3 레이어 간 의존성 규칙
+### 4.4 의존성 다이어그램
 
 ```
 ┌─────────────────────────────────────────┐
-│         Config Layer (설정)             │
+│         config.json (설정 데이터)         │
 └─────────────────────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────┐
-│         Utils Layer (순수 함수)          │
+│         config.js (설정 로드)             │
 └─────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────┐
-│      Managers Layer (리소스 관리)        │
-└─────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────┐
-│      Core Layer (게임 핵심 로직)         │
-└─────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────┐
-│    Components Layer (UI 컴포넌트)        │
-└─────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────┐
-│       Scenes Layer (게임 씬)             │
-└─────────────────────────────────────────┘
+        ↓           ↓           ↓
+    ┌───────┐  ┌────────┐  ┌──────────┐
+    │ diff  │  │ color  │  │ Timer   │
+    │ .js   │  │ .js    │  │ Manager │
+    └───────┘  └────────┘  └──────────┘
+        │           │              │
+        └─────┬─────┘              │
+              ↓                    │
+    ┌─────────────────┐            │
+    │  LevelLoader    │            │
+    │  (systems/)     │            │
+    └─────────────────┘            │
+              │                    │
+              └────────┬───────────┘
+                       ↓
+        ┌──────────────────────────┐
+        │  ScoringSystem           │
+        │  (systems/)              │
+        └──────────────────────────┘
+                       │
+        ┌──────────────┴──────────────┐
+        ↓                             ↓
+┌─────────────────┐         ┌─────────────────┐
+│  StorageManager │         │  HUDManager     │
+│  (managers/)    │         │  (ui/)          │
+└─────────────────┘         └─────────────────┘
+        │                             │
+        └─────────────┬─────────────────┘
+                      ↓
+        ┌─────────────────────────┐
+        │      game.js            │
+        │  (게임 메인 조율자)       │
+        └─────────────────────────┘
+                      ↓
+        ┌─────────────────────────┐
+        │      main.js            │
+        │  (진입점)                │
+        └─────────────────────────┘
 ```
 
-**규칙**:
-- 하위 레이어는 상위 레이어에 의존하지 않음
-- 같은 레이어 내부는 서로 의존 가능
-- 상위 레이어는 하위 레이어만 의존
+### 4.5 의존성 상세 설명
+
+**레벨 1 (기본 유틸리티 - 독립적)**
+- `config.js`: 설정 파일 로드만 담당, 다른 모듈에 의존하지 않음
+- `color.js`: 순수 함수 모음, 독립적
+
+**레벨 2 (설정 의존)**
+- `difficulty.js`: `config.js` 의존 (설정 스케줄 참조)
+- `TimerManager.js`: `config.js` 의존 (타이밍 설정 참조)
+- `StorageManager.js`: 독립적 (LocalStorage만 사용)
+
+**레벨 3 (유틸리티 조합)**
+- `LevelLoader.js`: `difficulty.js`, `color.js` 의존
+- `ScoringSystem.js`: `config.js` 의존 (설정만 참조, 순수 함수)
+- `HUDManager.js`: `TimerManager.js` 의존 (formatSeconds 사용)
+
+**레벨 4 (게임 메인)**
+- `game.js`: 모든 모듈 사용하여 게임 흐름 제어
+
+**레벨 5 (진입점)**
+- `main.js`: `config.js`, `game.js` 의존
+
+**의존성 규칙**:
+- 하위 레벨은 상위 레벨에 의존하지 않음 (단방향 의존성)
+- 같은 레벨 내에서는 서로 의존 가능 (예: LevelLoader가 difficulty, color 사용)
+- 순수 함수 모듈(`color.js`, `ScoringSystem.js`)은 테스트 용이
+- 관리자 모듈(`StorageManager`, `TimerManager`)은 독립적으로 교체 가능
 
 ---
 
