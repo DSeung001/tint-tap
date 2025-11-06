@@ -3,6 +3,7 @@ import { TimerManager } from './managers/TimerManager.js';
 import { ScoringSystem } from './systems/ScoringSystem.js';
 import { LevelLoader } from './systems/LevelLoader.js';
 import { HUDManager } from './ui/HUDManager.js';
+import { languageManager } from './managers/LanguageManager.js';
 
 export class TintTapGame {
   constructor(config) {
@@ -26,12 +27,19 @@ export class TintTapGame {
     this.cacheDom();
     this.bindUi();
     this.initializeManagers();
+    this.updateStaticTexts();
     this.showStartScreen();
     this.updateHud();
   }
 
   initializeManagers() {
     this.hudManager = new HUDManager(this.dom);
+    // HUDManager 생성 후 DOM 참조 업데이트
+    this.dom.levelDisplay = document.getElementById('level-display');
+    this.dom.scoreDisplay = document.getElementById('score-display');
+    this.dom.livesDisplay = document.getElementById('lives-display');
+    this.dom.timerDisplay = document.getElementById('timer-display');
+    this.dom.bestDisplay = document.getElementById('best-display');
     this.timerManager = new TimerManager(this.config, (formattedTime, remainingSeconds) => {
       this.dom.timerDisplay.textContent = formattedTime;
     });
@@ -62,17 +70,47 @@ export class TintTapGame {
     this.dom.okButton.addEventListener('click', () => this.commitSelection());
   }
 
+  updateStaticTexts() {
+    // HTML의 정적 텍스트들을 언어 파일에서 가져와서 업데이트
+    const titleElement = document.querySelector('title');
+    if (titleElement) {
+      titleElement.textContent = languageManager.t('gameTitle');
+    }
+
+    const logoElement = document.querySelector('.logo');
+    if (logoElement) {
+      logoElement.textContent = languageManager.t('gameTitle');
+    }
+
+    const taglineElement = document.querySelector('.tagline');
+    if (taglineElement) {
+      taglineElement.textContent = languageManager.t('tagline');
+    }
+
+    if (this.dom.startButton) {
+      this.dom.startButton.textContent = languageManager.t('startButton');
+    }
+
+    if (this.dom.restartButton) {
+      this.dom.restartButton.textContent = languageManager.t('restartButton');
+    }
+
+    if (this.dom.okButton) {
+      this.dom.okButton.textContent = languageManager.t('okButton');
+    }
+  }
+
   showStartScreen() {
     this.dom.startScreen.classList.remove('hidden');
     this.dom.gameOverScreen.classList.add('hidden');
-    this.dom.message.textContent = '레트로 감성 컬러 퍼즐, Tint Tap에 오신 것을 환영합니다!';
+    this.dom.message.textContent = languageManager.t('welcomeMessage');
   }
 
   startGame() {
     this.resetState();
     this.dom.startScreen.classList.add('hidden');
     this.dom.gameOverScreen.classList.add('hidden');
-    this.dom.message.textContent = '다른 색을 가진 타일을 모두 선택하세요!';
+    this.dom.message.textContent = languageManager.t('gameStartMessage');
     this.updateHud();
     this.loadLevel();
   }
@@ -105,7 +143,7 @@ export class TintTapGame {
 
   commitSelection() {
     if (this.selectedTiles.size === 0) {
-      this.dom.message.textContent = '선택된 타일이 없습니다. 다른 색을 찾아보세요!';
+      this.dom.message.textContent = languageManager.t('noSelectionMessage');
       return;
     }
 
@@ -139,7 +177,7 @@ export class TintTapGame {
     );
 
     this.score += scoreResult.totalScore;
-    this.dom.message.textContent = `정답! +${scoreResult.baseScore} / +${scoreResult.oddBonus} / +${scoreResult.timeBonus} 점수를 획득했습니다.`;
+    this.dom.message.textContent = `${languageManager.t('correctAnswer')} +${scoreResult.baseScore} / +${scoreResult.oddBonus} / +${scoreResult.timeBonus} ${languageManager.t('scoreGained')}`;
 
     this.level += 1;
     if (this.level > this.maxLevel) {
@@ -160,14 +198,14 @@ export class TintTapGame {
       return;
     }
 
-    this.dom.message.textContent = `오답! 남은 목숨 ${this.lives}개. 다시 시도하세요.`;
+    this.dom.message.textContent = `${languageManager.t('wrongAnswer')} ${languageManager.t('remainingLives')} ${this.lives}${languageManager.t('livesUnit')}. ${languageManager.t('tryAgain')}`;
     this.selectedTiles.clear();
     this.updateHud();
     this.loadLevel();
   }
 
   winGame() {
-    this.dom.message.textContent = '40단계 모두 클리어! 축하합니다!';
+    this.dom.message.textContent = languageManager.t('winMessage');
     this.gameOver(true);
   }
 
@@ -176,7 +214,7 @@ export class TintTapGame {
     this.bestScore = StorageManager.updateBestScore(this.score, this.bestScore);
     this.updateHud();
     
-    const title = isClear ? 'All Clear!' : 'Game Over';
+    const title = isClear ? languageManager.t('allClear') : languageManager.t('gameOver');
     this.dom.gameOverScreen.querySelector('h2').textContent = title;
     this.hudManager.updateGameOver(this.score, this.bestScore);
     this.dom.gameOverScreen.classList.remove('hidden');
