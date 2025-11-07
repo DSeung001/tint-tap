@@ -11,7 +11,7 @@
       <div class="panel">
         <h1 class="logo">Tint Tap</h1>
         <p class="tagline">Tint Tap!</p>
-        <button id="start-button" class="button primary">Start Game</button>
+        <button id="start-button" class="button primary icon-play">Start Game</button>
       </div>
     </div>
 
@@ -20,17 +20,17 @@
         <h2>Game Over</h2>
         <p id="final-score"></p>
         <p id="high-score"></p>
-        <button id="restart-button" class="button">Restart</button>
+        <button id="restart-button" class="button icon-restart">Restart</button>
       </div>
     </div>
 
     <main class="game-shell">
       <header class="hud">
-        <div class="hud-item">Level: <span id="level-display">1</span></div>
-        <div class="hud-item">Score: <span id="score-display">0</span></div>
-        <div class="hud-item">Lives: <span id="lives-display">3</span></div>
-        <div class="hud-item">Timer: <span id="timer-display">0.0s</span></div>
-        <div class="hud-item">Best: <span id="best-display">0</span></div>
+        <div class="hud-item icon-level"><span class="hud-label">Level</span><span class="hud-separator">|</span><span id="level-display" class="hud-value">1</span></div>
+        <div class="hud-item icon-score"><span class="hud-label">Score</span><span class="hud-separator">|</span><span id="score-display" class="hud-value">0</span></div>
+        <div class="hud-item icon-lives"><span class="hud-label">Lives</span><span class="hud-separator">|</span><span id="lives-display" class="hud-value">3</span></div>
+        <div class="hud-item icon-timer"><span class="hud-label">Bonus Timer</span><span class="hud-separator">|</span><span id="timer-display" class="hud-value">0.0s</span></div>
+        <div class="hud-item icon-best"><span class="hud-label">Best</span><span class="hud-separator">|</span><span id="best-display" class="hud-value">0</span></div>
       </header>
 
       <section id="message" class="message" aria-live="polite"></section>
@@ -40,7 +40,7 @@
       </section>
 
       <footer class="controls">
-        <button id="ok-button" class="button confirm">OK</button>
+        <button id="ok-button" class="button confirm icon-check">OK</button>
       </footer>
     </main>
 

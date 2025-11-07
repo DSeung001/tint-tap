@@ -8,34 +8,44 @@ export class HUDManager {
   }
 
   updateLabels() {
-    // HUD 레이블 업데이트
+    // HUD 레이블 업데이트 (아이콘 클래스 유지)
     const levelItem = this.dom.levelDisplay?.parentElement;
     if (levelItem) {
-      levelItem.innerHTML = `${languageManager.t('level')}: <span id="level-display">${this.dom.levelDisplay?.textContent || '1'}</span>`;
+      const iconClass = levelItem.classList.contains('icon-level') ? 'icon-level' : '';
+      levelItem.innerHTML = `<span class="hud-label">${languageManager.t('level')}</span><span class="hud-separator">|</span><span id="level-display" class="hud-value">${this.dom.levelDisplay?.textContent || '1'}</span>`;
+      if (iconClass) levelItem.classList.add(iconClass);
       this.dom.levelDisplay = document.getElementById('level-display');
     }
 
     const scoreItem = this.dom.scoreDisplay?.parentElement;
     if (scoreItem) {
-      scoreItem.innerHTML = `${languageManager.t('score')}: <span id="score-display">${this.dom.scoreDisplay?.textContent || '0'}</span>`;
+      const iconClass = scoreItem.classList.contains('icon-score') ? 'icon-score' : '';
+      scoreItem.innerHTML = `<span class="hud-label">${languageManager.t('score')}</span><span class="hud-separator">|</span><span id="score-display" class="hud-value">${this.dom.scoreDisplay?.textContent || '0'}</span>`;
+      if (iconClass) scoreItem.classList.add(iconClass);
       this.dom.scoreDisplay = document.getElementById('score-display');
     }
 
     const livesItem = this.dom.livesDisplay?.parentElement;
     if (livesItem) {
-      livesItem.innerHTML = `${languageManager.t('lives')}: <span id="lives-display">${this.dom.livesDisplay?.textContent || '3'}</span>`;
+      const iconClass = livesItem.classList.contains('icon-lives') ? 'icon-lives' : '';
+      livesItem.innerHTML = `<span class="hud-label">${languageManager.t('lives')}</span><span class="hud-separator">|</span><span id="lives-display" class="hud-value">${this.dom.livesDisplay?.textContent || '3'}</span>`;
+      if (iconClass) livesItem.classList.add(iconClass);
       this.dom.livesDisplay = document.getElementById('lives-display');
     }
 
     const timerItem = this.dom.timerDisplay?.parentElement;
     if (timerItem) {
-      timerItem.innerHTML = `${languageManager.t('timer')}: <span id="timer-display">${this.dom.timerDisplay?.textContent || '0.0s'}</span>`;
+      const iconClass = timerItem.classList.contains('icon-timer') ? 'icon-timer' : '';
+      timerItem.innerHTML = `<span class="hud-label">${languageManager.t('timer')}</span><span class="hud-separator">|</span><span id="timer-display" class="hud-value">${this.dom.timerDisplay?.textContent || '0.0s'}</span>`;
+      if (iconClass) timerItem.classList.add(iconClass);
       this.dom.timerDisplay = document.getElementById('timer-display');
     }
 
     const bestItem = this.dom.bestDisplay?.parentElement;
     if (bestItem) {
-      bestItem.innerHTML = `${languageManager.t('best')}: <span id="best-display">${this.dom.bestDisplay?.textContent || '0'}</span>`;
+      const iconClass = bestItem.classList.contains('icon-best') ? 'icon-best' : '';
+      bestItem.innerHTML = `<span class="hud-label">${languageManager.t('best')}</span><span class="hud-separator">|</span><span id="best-display" class="hud-value">${this.dom.bestDisplay?.textContent || '0'}</span>`;
+      if (iconClass) bestItem.classList.add(iconClass);
       this.dom.bestDisplay = document.getElementById('best-display');
     }
   }

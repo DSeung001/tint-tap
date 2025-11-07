@@ -19,7 +19,7 @@ export const ko = {
   level: 'Level',
   score: 'Score',
   lives: 'Lives',
-  timer: 'Timer',
+  timer: 'Bonus Timer',
   best: 'Best',
   
   // 게임 메시지

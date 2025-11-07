@@ -47,7 +47,7 @@ body {
 
 .hud {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 0.5rem;
   text-transform: uppercase;
   font-size: 0.75rem;
@@ -60,6 +60,124 @@ body {
   border-radius: 6px;
   text-align: center;
   letter-spacing: 1px;
+  position: relative;
+  padding-left: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 160px;
+}
+
+.hud-label {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.hud-separator {
+  color: var(--accent);
+  font-weight: bold;
+  margin: 0 0.3rem;
+}
+
+.hud-value {
+  color: var(--accent-light);
+  font-weight: bold;
+}
+
+/* 픽셀 아트 아이콘 스타일 */
+.hud-item::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Level 아이콘 - 계단 */
+.icon-level::before {
+  width: 14px;
+  height: 14px;
+  background: 
+    linear-gradient(to bottom, 
+      var(--accent-light) 0%, var(--accent-light) 20%,
+      transparent 20%, transparent 40%,
+      var(--accent-light) 40%, var(--accent-light) 60%,
+      transparent 60%, transparent 80%,
+      var(--accent-light) 80%, var(--accent-light) 100%);
+  box-shadow: 
+    2px 0 0 var(--accent-light),
+    4px 0 0 var(--accent-light),
+    2px 2px 0 var(--accent-light),
+    4px 2px 0 var(--accent-light),
+    4px 4px 0 var(--accent-light);
+}
+
+/* Score 아이콘 - 별 */
+.icon-score::before {
+  background: var(--accent-light);
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%, 68% 57%,
+    79% 91%, 50% 70%, 21% 91%, 32% 57%,
+    2% 35%, 39% 35%
+  );
+}
+
+/* Lives 아이콘 - 하트 */
+.icon-lives::before {
+  background: var(--accent);
+  clip-path: polygon(
+    50% 100%, 0% 38%, 0% 25%, 12% 12%,
+    25% 12%, 38% 25%, 50% 38%, 62% 25%,
+    75% 12%, 88% 12%, 100% 25%, 100% 38%
+  );
+}
+
+/* Timer 아이콘 - 시계 */
+.icon-timer::before {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent-light);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 
+    inset 3px 3px 0 var(--accent-light),
+    inset -3px -3px 0 var(--accent-light);
+}
+
+.icon-timer::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-left: 1.5px solid var(--accent-light);
+  transform: translateY(-50%) translateX(7px) translateY(-3px) rotate(-45deg);
+}
+
+/* Best 아이콘 - 트로피 */
+.icon-best::before {
+  background: var(--accent-light);
+  box-shadow: 
+    0 0 0 2px var(--accent-light),
+    0 0 0 4px transparent,
+    0 0 0 6px var(--accent-light),
+    0 8px 0 var(--accent-light),
+    0 10px 0 var(--accent-light),
+    0 12px 0 var(--accent-light);
+  clip-path: polygon(
+    20% 0%, 80% 0%, 80% 20%, 100% 20%,
+    100% 40%, 80% 40%, 80% 60%, 60% 60%,
+    60% 100%, 40% 100%, 40% 60%, 20% 60%,
+    20% 40%, 0% 40%, 0% 20%, 20% 20%
+  );
 }
 
 .message {
@@ -125,6 +243,67 @@ body {
   color: var(--text);
   cursor: pointer;
   transition: transform 100ms ease, box-shadow 100ms ease;
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+/* 버튼 아이콘 */
+.button::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Play 버튼 아이콘 - 삼각형 */
+.icon-play::before {
+  width: 0;
+  height: 0;
+  border-left: 8px solid currentColor;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  background: none;
+}
+
+/* Restart 버튼 아이콘 - 새로고침 화살표 */
+.icon-restart::before {
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-radius: 50%;
+  background: none;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.icon-restart::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px) translateY(-4px) rotate(45deg);
+  width: 0;
+  height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+}
+
+/* Check 버튼 아이콘 - 체크마크 */
+.icon-check::before {
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  background: none;
+  transform: translateY(-50%) translateX(-2px) rotate(-45deg);
 }
 
 .button:hover,
@@ -184,5 +363,30 @@ body {
 
   .panel {
     padding: 1.8rem;
+  }
+
+  .hud {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .hud-item {
+    min-width: 140px;
+    padding: 0.6rem;
+    padding-left: 2.2rem;
+    font-size: 0.65rem;
+  }
+
+  .hud-label {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hud {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .hud-item {
+    min-width: 140px;
   }
 }

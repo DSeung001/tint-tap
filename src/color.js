@@ -38,14 +38,30 @@ export function oddColorFrom(baseColor, delta, colorConfig) {
     chosenChannels = colorConfig.channelsToVary;
   }
 
-  const channelKey = chosenChannels[Math.floor(Math.random() * chosenChannels.length)];
-  const direction = Math.random() < 0.5 ? 1 : -1;
-  let value = baseColor[channelKey] + direction * delta;
-  if (value < 0 || value > 255) {
-    value = baseColor[channelKey] - direction * delta;
+  // 채널을 랜덤하게 섞기
+  const shuffledChannels = [...chosenChannels].sort(() => Math.random() - 0.5);
+  
+  // 70:20:10 비율로 delta 분배
+  const ratios = [0.7, 0.2, 0.1];
+  const result = { ...baseColor };
+  
+  for (let i = 0; i < Math.min(shuffledChannels.length, 3); i++) {
+    const channelKey = shuffledChannels[i];
+    const channelDelta = delta * ratios[i];
+    
+    // 각 채널의 방향을 랜덤하게 결정
+    const direction = Math.random() < 0.5 ? 1 : -1;
+    let value = baseColor[channelKey] + direction * channelDelta;
+    
+    // 범위를 벗어나면 반대 방향으로 시도
+    if (value < 0 || value > 255) {
+      value = baseColor[channelKey] - direction * channelDelta;
+    }
+    
+    result[channelKey] = clamp(value, 0, 255);
   }
-  value = clamp(value, 0, 255);
-  return { ...baseColor, [channelKey]: value };
+  
+  return result;
 }
 
 export function toCssColor({ r, g, b }) {
