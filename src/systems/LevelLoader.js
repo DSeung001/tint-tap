@@ -14,7 +14,7 @@ export class LevelLoader {
     return indices;
   }
 
-  createTileGrid(level, onTileClick) {
+  createTileGrid(level, onTileClick, audioManager) {
     const { cols, rows } = gridFor(level, this.config);
     const oddCount = oddCountFor(level, this.config);
     const delta = deltaFor(level, this.config);
@@ -33,7 +33,18 @@ export class LevelLoader {
       tile.style.background = oddTileIndices.has(i)
         ? toCssColor(oddColor)
         : toCssColor(baseColor);
-      tile.addEventListener('click', () => onTileClick(tile));
+      
+      // 타일 호버 효과음
+      tile.addEventListener('mouseenter', () => {
+        audioManager?.play('tileHover');
+      });
+      
+      // 타일 클릭 효과음 및 선택 처리
+      tile.addEventListener('click', () => {
+        audioManager?.play('tileClick');
+        onTileClick(tile);
+      });
+      
       tiles.push(tile);
     }
 
@@ -45,10 +56,10 @@ export class LevelLoader {
     };
   }
 
-  loadLevel(level, gridElement, onTileClick) {
+  loadLevel(level, gridElement, onTileClick, audioManager) {
     gridElement.innerHTML = '';
     
-    const { tiles, oddTileIndices, cols, rows } = this.createTileGrid(level, onTileClick);
+    const { tiles, oddTileIndices, cols, rows } = this.createTileGrid(level, onTileClick, audioManager);
     
     gridElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     gridElement.style.gridTemplateRows = `repeat(${rows}, 1fr)`;

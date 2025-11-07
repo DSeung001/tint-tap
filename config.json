@@ -59,5 +59,32 @@
   "ui": {
     "retro": true,
     "confirmCommit": false
+  },
+  "audio": {
+    "enabled": true,
+    "volume": {
+      "sfx": 0.7,
+      "bgm": 0.5
+    },
+    "sounds": {
+      "buttonHover": "",
+      "buttonClick": "assets/sound/sfx/switch4.wav",
+      "tileHover": "",
+      "tileClick": "assets/sound/sfx/switch4.wav",
+      "correct": "assets/sound/sfx/positive.wav",
+      "wrong": "assets/sound/sfx/negative.wav",
+      "bgmMenu": "",
+      "bgmGame": "assets/sound/bgm/Bit Bit Loop.mp3"
+    },
+    "soundVolumes": {
+      "buttonHover": 5.0,
+      "buttonClick": 5.0,
+      "tileHover": 5.0,
+      "tileClick": 5.0,
+      "correct": 1.0,
+      "wrong": 2.5,
+      "bgmMenu": 1.0,
+      "bgmGame": 1.0
+    }
   }
 }

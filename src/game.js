@@ -1,5 +1,6 @@
 import { StorageManager } from './managers/StorageManager.js';
 import { TimerManager } from './managers/TimerManager.js';
+import { AudioManager } from './managers/AudioManager.js';
 import { ScoringSystem } from './systems/ScoringSystem.js';
 import { LevelLoader } from './systems/LevelLoader.js';
 import { HUDManager } from './ui/HUDManager.js';
@@ -43,6 +44,8 @@ export class TintTapGame {
     this.timerManager = new TimerManager(this.config, (formattedTime, remainingSeconds) => {
       this.dom.timerDisplay.textContent = formattedTime;
     });
+    this.audioManager = new AudioManager(this.config);
+    this.audioManager.init();
   }
 
   cacheDom() {
@@ -65,9 +68,32 @@ export class TintTapGame {
   }
 
   bindUi() {
-    this.dom.startButton.addEventListener('click', () => this.startGame());
-    this.dom.restartButton.addEventListener('click', () => this.startGame());
-    this.dom.okButton.addEventListener('click', () => this.commitSelection());
+    // 시작 버튼 이벤트
+    this.dom.startButton.addEventListener('mouseenter', () => {
+      this.audioManager?.play('buttonHover');
+    });
+    this.dom.startButton.addEventListener('click', () => {
+      this.audioManager?.play('buttonClick');
+      this.startGame();
+    });
+
+    // 재시작 버튼 이벤트
+    this.dom.restartButton.addEventListener('mouseenter', () => {
+      this.audioManager?.play('buttonHover');
+    });
+    this.dom.restartButton.addEventListener('click', () => {
+      this.audioManager?.play('buttonClick');
+      this.startGame();
+    });
+
+    // OK 버튼 이벤트
+    this.dom.okButton.addEventListener('mouseenter', () => {
+      this.audioManager?.play('buttonHover');
+    });
+    this.dom.okButton.addEventListener('click', () => {
+      this.audioManager?.play('buttonClick');
+      this.commitSelection();
+    });
   }
 
   updateStaticTexts() {
@@ -104,6 +130,8 @@ export class TintTapGame {
     this.dom.startScreen.classList.remove('hidden');
     this.dom.gameOverScreen.classList.add('hidden');
     this.dom.message.textContent = languageManager.t('welcomeMessage');
+    // 메뉴 BGM 재생
+    this.audioManager?.playBGM('bgmMenu');
   }
 
   startGame() {
@@ -111,6 +139,8 @@ export class TintTapGame {
     this.dom.startScreen.classList.add('hidden');
     this.dom.gameOverScreen.classList.add('hidden');
     this.dom.message.textContent = languageManager.t('gameStartMessage');
+    // 게임 BGM으로 전환
+    this.audioManager?.playBGM('bgmGame');
     this.updateHud();
     this.loadLevel();
   }
@@ -123,7 +153,8 @@ export class TintTapGame {
     this.activeOddTiles = this.levelLoader.loadLevel(
       this.level,
       this.dom.grid,
-      (tile) => this.toggleTile(tile)
+      (tile) => this.toggleTile(tile),
+      this.audioManager
     );
 
     this.timerManager.start();
@@ -168,6 +199,9 @@ export class TintTapGame {
   }
 
   handleCorrectAnswer() {
+    // 정답 효과음 재생
+    this.audioManager?.play('correct');
+    
     const elapsedSec = this.timerManager.getElapsedSeconds();
     const scoreResult = ScoringSystem.calculateLevelScore(
       this.level,
@@ -190,6 +224,9 @@ export class TintTapGame {
   }
 
   handleWrongAnswer() {
+    // 오답 효과음 재생
+    this.audioManager?.play('wrong');
+    
     this.lives -= 1;
     this.score = ScoringSystem.calculateWrongPenalty(this.score, this.config);
 
@@ -213,6 +250,9 @@ export class TintTapGame {
     this.timerManager.clear();
     this.bestScore = StorageManager.updateBestScore(this.score, this.bestScore);
     this.updateHud();
+    
+    // 게임 오버 시 메뉴 BGM으로 전환
+    this.audioManager?.playBGM('bgmMenu');
     
     const title = isClear ? languageManager.t('allClear') : languageManager.t('gameOver');
     this.dom.gameOverScreen.querySelector('h2').textContent = title;
