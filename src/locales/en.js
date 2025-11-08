@@ -30,7 +30,7 @@ export const en = {
   remainingLives: 'Remaining lives',
   livesUnit: '',
   tryAgain: 'Try again.',
-  winMessage: 'All 40 levels cleared! Congratulations!',
+  winMessage: 'All ${maxLevel} levels cleared! Congratulations!',
   
   // Score messages
   scoreGained: 'points gained.',

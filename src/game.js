@@ -187,10 +187,11 @@ export class TintTapGame {
       // LanguageManager를 통해 메시지 번역
       const translatedMessage = languageManager.translateMessage(
         this.dom.message.textContent,
-        { lives: this.lives }
+        { lives: this.lives, maxLevel: this.maxLevel }
       );
       if (translatedMessage) {
         this.dom.message.textContent = translatedMessage;
+        this.updateMessage();
       }
     }
     
@@ -438,7 +439,9 @@ export class TintTapGame {
   }
 
   winGame() {
-    this.dom.message.textContent = languageManager.t('winMessage');
+    const winMessage = languageManager.t('winMessage', { maxLevel: this.maxLevel });
+    this.dom.message.textContent = winMessage;
+    this.updateMessage();
     this.gameOver(true);
   }
 

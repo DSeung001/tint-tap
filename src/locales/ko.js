@@ -30,7 +30,7 @@ export const ko = {
   remainingLives: '남은 목숨',
   livesUnit: '개',
   tryAgain: '다시 시도하세요.',
-  winMessage: '40단계 모두 클리어! 축하합니다!',
+  winMessage: '${maxLevel}단계 모두 클리어! 축하합니다!',
   
   // 점수 메시지
   scoreGained: '점수를 획득했습니다.',

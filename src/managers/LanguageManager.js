@@ -127,7 +127,10 @@ export class LanguageManager {
     
     // 승리 메시지 확인
     if (this.isMessageType(currentText, 'winMessage')) {
-      return this.t('winMessage');
+      if (context.maxLevel !== undefined) {
+        return this.t('winMessage', { maxLevel: context.maxLevel });
+      }
+      return this.t('winMessage', { maxLevel: 100 }); // 기본값
     }
     
     return null;
