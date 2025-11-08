@@ -51,14 +51,33 @@ export class ShuffleGimmick extends BaseGimmick {
     const cols = parseInt(grid.dataset.cols) || 3;
     const rows = parseInt(grid.dataset.rows) || 3;
     
+    // 셔플 준비
+    let shuffledTiles;
+    switch (intensity) {
+      case 'easy':
+        shuffledTiles = this.prepareShuffleEasy(tiles, cols, rows);
+        break;
+      case 'medium':
+        shuffledTiles = this.prepareShuffleMedium(tiles, cols, rows);
+        break;
+      case 'hard':
+        shuffledTiles = this.prepareShuffleHard(tiles);
+        break;
+    }
+    
+    // 실제로 순서가 바뀌었는지 확인
+    if (!this.hasOrderChanged(tiles, shuffledTiles)) {
+      return; // 순서가 바뀌지 않았으면 애니메이션 실행하지 않음
+    }
+    
     // 애니메이션을 사용하여 뒤섞기
-    this.shuffleTilesWithAnimation(tiles, cols, rows, intensity);
+    this.shuffleTilesWithAnimation(tiles, shuffledTiles, cols, rows);
   }
 
   /**
    * 애니메이션을 사용하여 타일 뒤섞기
    */
-  async shuffleTilesWithAnimation(tiles, cols, rows, intensity) {
+  async shuffleTilesWithAnimation(tiles, shuffledTiles, cols, rows) {
     const grid = this.game.dom.grid;
     if (!grid) return;
 
@@ -91,21 +110,7 @@ export class ShuffleGimmick extends BaseGimmick {
     // 1단계: 모든 타일을 중앙으로 모으기
     await this.animateTilesToCenter(tiles, centerX, centerY, originalPositions);
 
-    // 2단계: 타일 순서 뒤섞기
-    let shuffledTiles;
-    switch (intensity) {
-      case 'easy':
-        shuffledTiles = this.prepareShuffleEasy(tiles, cols, rows);
-        break;
-      case 'medium':
-        shuffledTiles = this.prepareShuffleMedium(tiles, cols, rows);
-        break;
-      case 'hard':
-        shuffledTiles = this.prepareShuffleHard(tiles);
-        break;
-    }
-
-    // 3단계: DOM에서 타일 재배치
+    // 2단계: DOM에서 타일 재배치
     this.reorderTilesInDOM(shuffledTiles, grid);
 
     // 애니메이션 완료 후 transform 제거
@@ -142,7 +147,27 @@ export class ShuffleGimmick extends BaseGimmick {
    * 쉬운 난이도: 가로 한 줄 뒤섞기 준비
    */
   prepareShuffleEasy(tiles, cols, rows) {
-    const randomRow = Math.floor(Math.random() * rows);
+    // 색이 다른 타일이 있는 줄 찾기
+    const validRows = [];
+    for (let r = 0; r < rows; r++) {
+      const rowTiles = [];
+      for (let i = 0; i < tiles.length; i++) {
+        const row = Math.floor(i / cols);
+        if (row === r) {
+          rowTiles.push(tiles[i]);
+        }
+      }
+      if (this.hasDifferentColors(rowTiles)) {
+        validRows.push(r);
+      }
+    }
+    
+    // 유효한 줄이 없으면 원본 반환
+    if (validRows.length === 0) {
+      return [...tiles];
+    }
+    
+    const randomRow = validRows[Math.floor(Math.random() * validRows.length)];
     const rowTiles = [];
     const otherTiles = [];
     
@@ -181,7 +206,25 @@ export class ShuffleGimmick extends BaseGimmick {
   prepareShuffleMedium(tiles, cols, rows) {
     if (Math.random() < 0.5) {
       // 가로 2줄
-      const startRow = Math.floor(Math.random() * Math.max(1, rows - 1));
+      const validRowPairs = [];
+      for (let startRow = 0; startRow < rows - 1; startRow++) {
+        const rowTiles = [];
+        for (let i = 0; i < tiles.length; i++) {
+          const row = Math.floor(i / cols);
+          if (row >= startRow && row < startRow + 2 && row < rows) {
+            rowTiles.push(tiles[i]);
+          }
+        }
+        if (this.hasDifferentColors(rowTiles)) {
+          validRowPairs.push(startRow);
+        }
+      }
+      
+      if (validRowPairs.length === 0) {
+        return [...tiles];
+      }
+      
+      const startRow = validRowPairs[Math.floor(Math.random() * validRowPairs.length)];
       const rowTiles = [];
       const otherTiles = [];
       
@@ -225,7 +268,25 @@ export class ShuffleGimmick extends BaseGimmick {
       return result;
     } else {
       // 세로 2줄
-      const startCol = Math.floor(Math.random() * Math.max(1, cols - 1));
+      const validColPairs = [];
+      for (let startCol = 0; startCol < cols - 1; startCol++) {
+        const colTiles = [];
+        for (let i = 0; i < tiles.length; i++) {
+          const col = i % cols;
+          if (col >= startCol && col < startCol + 2 && col < cols) {
+            colTiles.push(tiles[i]);
+          }
+        }
+        if (this.hasDifferentColors(colTiles)) {
+          validColPairs.push(startCol);
+        }
+      }
+      
+      if (validColPairs.length === 0) {
+        return [...tiles];
+      }
+      
+      const startCol = validColPairs[Math.floor(Math.random() * validColPairs.length)];
       const colTiles = [];
       const otherTiles = [];
       
@@ -299,6 +360,37 @@ export class ShuffleGimmick extends BaseGimmick {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
+  }
+
+  /**
+   * 타일 배열에 서로 다른 색이 있는지 확인
+   */
+  hasDifferentColors(tiles) {
+    if (tiles.length < 2) return false;
+    
+    const colors = new Set();
+    for (const tile of tiles) {
+      const color = tile.style.background || tile.style.backgroundColor;
+      colors.add(color);
+      if (colors.size >= 2) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 셔플 후 실제로 순서가 바뀌었는지 확인
+   */
+  hasOrderChanged(originalTiles, shuffledTiles) {
+    if (originalTiles.length !== shuffledTiles.length) return true;
+    
+    for (let i = 0; i < originalTiles.length; i++) {
+      if (originalTiles[i] !== shuffledTiles[i]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   onDeactivate() {

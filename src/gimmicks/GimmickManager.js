@@ -2,6 +2,50 @@ import { ShuffleGimmick } from './gimmicks/ShuffleGimmick.js';
 // 다른 기믹들도 여기에 import
 
 /**
+ * 기믹 레지스트리 - 새로운 기믹을 자동으로 등록
+ */
+class GimmickRegistry {
+  constructor() {
+    this.gimmickClasses = new Map();
+    this.registerDefaultGimmicks();
+  }
+
+  /**
+   * 기본 기믹 등록
+   */
+  registerDefaultGimmicks() {
+    this.register('shuffle', ShuffleGimmick);
+    // 새로운 기믹 추가 시 여기에 등록
+    // this.register('hide', HideGimmick);
+    // this.register('flow', FlowGimmick);
+  }
+
+  /**
+   * 기믹 클래스 등록
+   */
+  register(name, gimmickClass) {
+    this.gimmickClasses.set(name, gimmickClass);
+  }
+
+  /**
+   * 기믹 클래스 가져오기
+   */
+  get(name) {
+    return this.gimmickClasses.get(name);
+  }
+
+  /**
+   * 등록된 모든 기믹 이름 가져오기
+   */
+  getAllNames() {
+    return Array.from(this.gimmickClasses.keys());
+  }
+}
+
+// 싱글톤 인스턴스
+const gimmickRegistry = new GimmickRegistry();
+
+/**
  * 기믹 시스템 관리자
  */
 export class GimmickManager {
@@ -41,23 +85,18 @@ export class GimmickManager {
    * 기믹 인스턴스 생성
    */
   createGimmick(config) {
-    let gimmick = null;
+    const GimmickClass = gimmickRegistry.get(config.name);
     
-    switch (config.name) {
-      case 'shuffle':
-        gimmick = new ShuffleGimmick(config, this.game);
-        break;
-      // 다른 기믹들 추가 예정
-      // case 'hide':
-      //   gimmick = new HideGimmick(config, this.game);
-      //   break;
-      default:
-        console.warn(`Unknown gimmick: ${config.name}`);
-        return;
+    if (!GimmickClass) {
+      console.warn(`Unknown gimmick: ${config.name}. Available: ${gimmickRegistry.getAllNames().join(', ')}`);
+      return;
     }
     
-    if (gimmick) {
+    try {
+      const gimmick = new GimmickClass(config, this.game);
       this.gimmicks.set(config.name, gimmick);
+    } catch (error) {
+      console.error(`Failed to create gimmick "${config.name}":`, error);
     }
   }
 
@@ -105,10 +144,9 @@ export class GimmickManager {
     
     if (availableGimmicks.length === 0) return;
 
-    // 랜덤으로 기믹 선택
-    const randomGimmick = availableGimmicks[
-      Math.floor(Math.random() * availableGimmicks.length)
-    ];
+    // 랜덤으로 기믹 선택 (균등 확률)
+    const randomIndex = Math.floor(Math.random() * availableGimmicks.length);
+    const randomGimmick = availableGimmicks[randomIndex];
 
     this.activateGimmick(randomGimmick.name);
   }
