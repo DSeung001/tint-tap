@@ -60,16 +60,6 @@ export class LanguageManager {
     return this.currentLanguage;
   }
 
-  // 사용 가능한 언어 목록 가져오기
-  getAvailableLanguages() {
-    return Object.keys(this.translations);
-  }
-
-  // 새로운 언어 추가
-  addLanguage(langCode, translations) {
-    this.translations[langCode] = translations;
-  }
-  
   /**
    * 현재 메시지가 특정 키의 번역인지 확인
    */

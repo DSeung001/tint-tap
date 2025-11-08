@@ -68,5 +68,12 @@ export class LevelLoader {
     
     return oddTileIndices;
   }
+
+  /**
+   * 레벨에 맞는 그리드 정보 가져오기 (기믹 시스템용)
+   */
+  getGridInfo(level, config) {
+    return gridFor(level, config);
+  }
 }
 

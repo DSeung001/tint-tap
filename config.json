@@ -31,10 +31,10 @@
     { "range": [16, 30], "count": 2 },
     { "range": [31, 45], "count": 3 },
     { "range": [46, 60], "count": 4 },
-    { "range": [61, 75], "count": 5 },
-    { "range": [76, 85], "count": 6 },
-    { "range": [86, 95], "count": 7 },
-    { "range": [96, 100], "count": 8 }
+    { "range": [61, 75], "count": 4 },
+    { "range": [76, 85], "count": 5 },
+    { "range": [86, 95], "count": 6 },
+    { "range": [96, 100], "count": 7 }
   ],
   "gridSchedule": [
     { "range": [1, 8], "cols": 3, "rows": 3 },
@@ -45,7 +45,7 @@
     { "range": [61, 75], "cols": 6, "rows": 5 },
     { "range": [76, 85], "cols": 6, "rows": 6 },
     { "range": [86, 95], "cols": 7, "rows": 6 },
-    { "range": [96, 100], "cols": 7, "rows": 7 }
+    { "range": [96, 100], "cols": 8, "rows": 6 }
   ],
   "timing": {
     "bonusClockPerLevelSec": 30,
@@ -73,6 +73,8 @@
       "tileClick": "assets/sound/sfx/switch4.wav",
       "correct": "assets/sound/sfx/positive.wav",
       "wrong": "assets/sound/sfx/negative.wav",
+      "gimmick": "",
+      "bossDamage": "",
       "bgmMenu": "",
       "bgmGame": "assets/sound/bgm/Bit Bit Loop.mp3"
     },
@@ -83,8 +85,33 @@
       "tileClick": 5.0,
       "correct": 1.0,
       "wrong": 4.0,
+      "gimmick": 0.8,
+      "bossDamage": 1.0,
       "bgmMenu": 1.0,
       "bgmGame": 1.0
     }
+  },
+  "gimmicks": {
+    "enabled": true,
+    "startLevel": 20,
+    "probability": 0.3,
+    "singleActive": true,
+    "gimmicks": [
+      {
+        "name": "shuffle",
+        "enabled": true,
+        "difficultyRanges": [
+          { "range": [20, 40], "intensity": "easy", "interval": 12 },
+          { "range": [41, 70], "intensity": "medium", "interval": 10 },
+          { "range": [71, 100], "intensity": "hard", "interval": 7 }
+        ]
+      }
+    ]
+  },
+  "boss": {
+    "enabled": true,
+    "startLevel": 80,
+    "showBossSprite": true,
+    "animationDuration": 1000
   }
 }

@@ -5,6 +5,10 @@ import { ScoringSystem } from './systems/ScoringSystem.js';
 import { LevelLoader } from './systems/LevelLoader.js';
 import { HUDManager } from './ui/HUDManager.js';
 import { languageManager } from './managers/LanguageManager.js';
+import { GimmickManager } from './gimmicks/GimmickManager.js';
+import { BossCharacter } from './gimmicks/BossCharacter.js';
+import { DevMode } from './ui/DevMode.js';
+import { BossHUD } from './ui/BossHUD.js';
 
 export class TintTapGame {
   constructor(config) {
@@ -22,6 +26,16 @@ export class TintTapGame {
     this.bestScore = StorageManager.loadBestScore();
     this.activeOddTiles = new Set();
     this.selectedTiles = new Set();
+    
+    // 보스 HUD는 항상 숨김 상태 유지
+    if (this.bossHUD) {
+      this.bossHUD.hide();
+    }
+    
+    // 기믹 시스템 리셋
+    if (this.gimmickManager) {
+      this.gimmickManager.reset();
+    }
   }
 
   init() {
@@ -48,6 +62,18 @@ export class TintTapGame {
     });
     this.audioManager = new AudioManager(this.config);
     this.audioManager.init();
+    
+    // 보스 캐릭터 초기화
+    this.bossCharacter = new BossCharacter(document.body);
+    
+    // 보스 HUD 초기화 (레이저 효과용, HP 로직 없음)
+    this.bossHUD = new BossHUD(document.body, this);
+    
+    // 기믹 매니저 초기화
+    this.gimmickManager = new GimmickManager(this.config, this);
+    
+    // 개발자 모드 초기화
+    this.devMode = new DevMode(this);
   }
 
   cacheDom() {
@@ -241,8 +267,43 @@ export class TintTapGame {
       this.audioManager
     );
 
+    // 그리드 크기 정보 저장 (기믹에서 사용)
+    const gridInfo = this.levelLoader.getGridInfo(this.level, this.config);
+    if (this.dom.grid) {
+      this.dom.grid.dataset.cols = gridInfo.cols;
+      this.dom.grid.dataset.rows = gridInfo.rows;
+    }
+
+    // 보스 시작 레벨 체크
+    const bossStartLevel = this.config.boss?.startLevel || 80;
+    if (this.level >= bossStartLevel) {
+      // 보스 캐릭터 표시
+      if (this.bossCharacter) {
+        this.bossCharacter.show();
+      }
+    } else {
+      // 보스 시작 레벨 이전이면 보스 캐릭터 숨기기
+      if (this.bossCharacter) {
+        this.bossCharacter.hide();
+      }
+    }
+
+    // 기믹 시스템에 레벨 변경 알림 (레이저 효과 후에 실행)
+    if (this.gimmickManager) {
+      // 약간의 딜레이를 주어 레이저 효과가 먼저 완료되도록
+      setTimeout(() => {
+        this.gimmickManager.onLevelChange(this.level);
+      }, 100);
+    }
+
     this.timerManager.start();
     this.updateHud();
+    this.updateMessage();
+    
+    // 개발자 모드 업데이트
+    if (this.devMode) {
+      this.devMode.onGameUpdate();
+    }
   }
 
   toggleTile(tile) {
@@ -254,11 +315,28 @@ export class TintTapGame {
       this.selectedTiles.add(index);
       tile.classList.add('selected');
     }
+    this.updateMessage();
+  }
+
+  updateMessage() {
+    if (!this.dom.message) return;
+    
+    const selectedCount = this.selectedTiles.size;
+    const targetCount = this.activeOddTiles.size;
+    
+    // 기존 메시지가 있으면 유지하고, 타일 개수는 다음 줄에 표시
+    const currentMessage = this.dom.message.textContent;
+    const lines = currentMessage.split('\n');
+    const mainMessage = lines[0] || '';
+    
+    // 타일 개수 정보 추가
+    this.dom.message.textContent = mainMessage + (mainMessage ? '\n' : '') + `${selectedCount}/${targetCount}`;
   }
 
   commitSelection() {
     if (this.selectedTiles.size === 0) {
       this.dom.message.textContent = languageManager.t('noSelectionMessage');
+      this.updateMessage();
       return;
     }
 
@@ -295,7 +373,29 @@ export class TintTapGame {
     );
 
     this.score += scoreResult.totalScore;
-    this.dom.message.textContent = `${languageManager.t('correctAnswer')} +${scoreResult.baseScore} / +${scoreResult.oddBonus} / +${scoreResult.timeBonus} ${languageManager.t('scoreGained')}`;
+    const scoreMessage = `${languageManager.t('correctAnswer')} +${scoreResult.baseScore} / +${scoreResult.oddBonus} / +${scoreResult.timeBonus} ${languageManager.t('scoreGained')}`;
+    this.dom.message.textContent = scoreMessage;
+    this.updateMessage();
+
+    // 기믹 시스템에 레벨 클리어 알림
+    if (this.gimmickManager) {
+      this.gimmickManager.onLevelComplete();
+    }
+
+    // 보스 데미지 효과 (보스 시작 레벨 이후)
+    // 레이저 효과는 기믹 실행 전에 먼저 표시하여 충돌 방지
+    const bossStartLevel = this.config.boss?.startLevel || 80;
+    if (this.level >= bossStartLevel) {
+      // 레이저 효과 표시 (기믹 실행 전)
+      if (this.bossHUD && this.dom.grid) {
+        this.bossHUD.showArrowEffect(this.dom.grid);
+      }
+      
+      // 보스 데미지 애니메이션
+      if (this.bossCharacter) {
+        this.bossCharacter.playAnimation('bounce');
+      }
+    }
 
     this.level += 1;
     if (this.level > this.maxLevel) {
@@ -305,6 +405,11 @@ export class TintTapGame {
 
     this.updateHud();
     this.loadLevel();
+    
+    // 개발자 모드 업데이트
+    if (this.devMode) {
+      this.devMode.onGameUpdate();
+    }
   }
 
   handleWrongAnswer() {
@@ -319,10 +424,17 @@ export class TintTapGame {
       return;
     }
 
-    this.dom.message.textContent = `${languageManager.t('wrongAnswer')} ${languageManager.t('remainingLives')} ${this.lives}${languageManager.t('livesUnit')}. ${languageManager.t('tryAgain')}`;
+    const wrongMessage = `${languageManager.t('wrongAnswer')} ${languageManager.t('remainingLives')} ${this.lives}${languageManager.t('livesUnit')}. ${languageManager.t('tryAgain')}`;
+    this.dom.message.textContent = wrongMessage;
     this.selectedTiles.clear();
     this.updateHud();
+    this.updateMessage();
     this.loadLevel();
+    
+    // 개발자 모드 업데이트
+    if (this.devMode) {
+      this.devMode.onGameUpdate();
+    }
   }
 
   winGame() {
