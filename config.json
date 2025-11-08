@@ -82,7 +82,7 @@
       "tileHover": 5.0,
       "tileClick": 5.0,
       "correct": 1.0,
-      "wrong": 2.5,
+      "wrong": 4.0,
       "bgmMenu": 1.0,
       "bgmGame": 1.0
     }

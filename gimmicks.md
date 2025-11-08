@@ -22,8 +22,9 @@
 ### 2.1 기믹 발생 메커니즘
 
 #### 기믹 발생 조건
-- **시작 레벨**: `config.gimmicks.startLevel` (기본값: 10)
+- **시작 레벨**: `config.gimmicks.startLevel` (기본값: 20)
 - **발생 확률**: `config.gimmicks.probability` (기본값: 0.3)
+- **동시 발생 제한**: `config.gimmicks.singleActive` (기본값: true) - 한번에 하나의 기믹만 활성화
 - **도트 캐릭터 표시**: 기믹 발생 시 도트 캐릭터가 화면에 나타나서 장난치는 애니메이션 표시
 
 #### 도트 캐릭터 애니메이션
@@ -43,13 +44,20 @@
 - **중반**: 가로 2줄, 세로 2줄 또는 가로와 세로를 섞어서 뒤섞기
 - **후반**: 모든 타일을 완전히 무작위로 뒤섞기
 
+#### 난이도 구간 설정
+- `config.gimmicks.gimmicks[].difficultyRanges` 배열로 레벨 구간별 난이도 설정
+- 각 구간은 `range` (레벨 범위)와 `intensity` (난이도 값)를 가짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "shuffle",
   "enabled": true,
-  "interval": 10,
-  "intensity": "progressive"
+  "difficultyRanges": [
+    { "range": [20, 40], "intensity": "easy", "interval": 12 },
+    { "range": [41, 70], "intensity": "medium", "interval": 10 },
+    { "range": [71, 100], "intensity": "hard", "interval": 7 }
+  ]
 }
 ```
 
@@ -69,13 +77,19 @@
 - 15초가 지나면 숨겨진 타일이 다시 나타남
 - 동시에 다른 타일들이 숨겨짐 (새로운 패턴)
 
+#### 난이도 구간 설정
+- 레벨에 따라 숨기는 타일 수와 빈도가 달라짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "hide",
   "enabled": true,
-  "interval": 15,
-  "count": [1, 5]
+  "difficultyRanges": [
+    { "range": [20, 40], "count": [1, 3], "interval": 18 },
+    { "range": [41, 70], "count": [2, 5], "interval": 15 },
+    { "range": [71, 100], "count": [4, 10], "interval": 12 }
+  ]
 }
 ```
 
@@ -102,12 +116,19 @@
 - 화면을 넘어가면 다시 왼쪽에서 시작
 - 연속적인 흐름 효과
 
+#### 난이도 구간 설정
+- 레벨에 따라 흐름 속도와 방향이 달라질 수 있음
+
 #### 설정 (config.json)
 ```json
 {
   "name": "flow",
   "enabled": true,
-  "direction": "vertical" // or "horizontal"
+  "difficultyRanges": [
+    { "range": [20, 50], "direction": "vertical", "speed": 1.0 },
+    { "range": [51, 80], "direction": ["vertical", "horizontal"], "speed": 1.8 },
+    { "range": [81, 100], "direction": ["vertical", "horizontal"], "speed": 2.5 }
+  ]
 }
 ```
 
@@ -127,12 +148,19 @@
 - 짧은 깜빡임으로 주의를 분산시킴
 - 레벨이 올라갈수록 빈도와 속도가 증가
 
+#### 난이도 구간 설정
+- 레벨에 따라 페이드 속도와 빈도가 달라짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "fade",
   "enabled": true,
-  "speed": "progressive"
+  "difficultyRanges": [
+    { "range": [20, 50], "speed": 0.5, "frequency": 2.0, "affectedTiles": 2 },
+    { "range": [51, 80], "speed": 1.2, "frequency": 3.5, "affectedTiles": 4 },
+    { "range": [81, 100], "speed": 2.0, "frequency": 5.0, "affectedTiles": 6 }
+  ]
 }
 ```
 
@@ -152,13 +180,19 @@
 - 회전 중에도 클릭 가능
 - 회전 속도는 레벨에 따라 조절
 
+#### 난이도 구간 설정
+- 레벨에 따라 회전 각도와 속도가 달라짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "rotation",
   "enabled": true,
-  "angle": [90, 180],
-  "speed": "progressive"
+  "difficultyRanges": [
+    { "range": [20, 50], "angle": [90], "speed": 1.0, "affectedTiles": 2 },
+    { "range": [51, 80], "angle": [90, 180], "speed": 1.8, "affectedTiles": 4 },
+    { "range": [81, 100], "angle": [180, 270], "speed": 2.5, "affectedTiles": 6 }
+  ]
 }
 ```
 
@@ -178,13 +212,19 @@
 - 반전 전후의 색상 위치를 기억해야 함
 - 반전 시간은 레벨에 따라 짧아짐
 
+#### 난이도 구간 설정
+- 레벨에 따라 반전 지속 시간과 방향이 달라짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "mirror",
   "enabled": true,
-  "direction": ["horizontal", "vertical"],
-  "duration": "progressive"
+  "difficultyRanges": [
+    { "range": [20, 50], "direction": ["horizontal"], "duration": 2500 },
+    { "range": [51, 80], "direction": ["horizontal", "vertical"], "duration": 1500 },
+    { "range": [81, 100], "direction": ["horizontal", "vertical"], "duration": 800, "frequency": 2 }
+  ]
 }
 ```
 
@@ -204,13 +244,19 @@
 - 작은 타일은 클릭하기 어려워짐
 - 큰 타일은 눈에 띄지만 다른 타일을 가릴 수 있음
 
+#### 난이도 구간 설정
+- 레벨에 따라 크기 변화 범위와 속도가 달라짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "size",
   "enabled": true,
-  "range": [0.8, 1.2],
-  "speed": "progressive"
+  "difficultyRanges": [
+    { "range": [20, 50], "sizeRange": [0.9, 1.1], "speed": 1.0, "affectedTiles": 2 },
+    { "range": [51, 80], "sizeRange": [0.8, 1.2], "speed": 1.8, "affectedTiles": 4 },
+    { "range": [81, 100], "sizeRange": [0.6, 1.4], "speed": 2.5, "affectedTiles": 6 }
+  ]
 }
 ```
 
@@ -230,12 +276,19 @@
 - 일부 타일에 블러 효과 적용 (난이도 상승)
 - 선택된 타일만 선명하게 표시
 
+#### 난이도 구간 설정
+- 레벨에 따라 블러 강도와 영향받는 타일 수가 달라짐
+
 #### 설정 (config.json)
 ```json
 {
   "name": "shadow",
   "enabled": true,
-  "intensity": "progressive"
+  "difficultyRanges": [
+    { "range": [20, 50], "blurIntensity": 2, "affectedTiles": 2 },
+    { "range": [51, 80], "blurIntensity": 5, "affectedTiles": 5 },
+    { "range": [81, 100], "blurIntensity": 8, "affectedTiles": 8 }
+  ]
 }
 ```
 
@@ -294,53 +347,81 @@
 ```json
 "gimmicks": {
   "enabled": true,
-  "startLevel": 10,
+  "startLevel": 20,
   "probability": 0.3,
+  "singleActive": true,
   "gimmicks": [
     {
       "name": "shuffle",
       "enabled": true,
-      "interval": 10,
-      "intensity": "progressive"
+      "difficultyRanges": [
+        { "range": [20, 40], "intensity": "easy", "interval": 12 },
+        { "range": [41, 70], "intensity": "medium", "interval": 10 },
+        { "range": [71, 100], "intensity": "hard", "interval": 7 }
+      ]
     },
     {
       "name": "hide",
       "enabled": true,
-      "interval": 15,
-      "count": [1, 5]
+      "difficultyRanges": [
+        { "range": [20, 40], "count": [1, 3], "interval": 18 },
+        { "range": [41, 70], "count": [2, 5], "interval": 15 },
+        { "range": [71, 100], "count": [4, 10], "interval": 12 }
+      ]
     },
     {
       "name": "flow",
       "enabled": true,
-      "direction": "vertical"
+      "difficultyRanges": [
+        { "range": [20, 50], "direction": "vertical", "speed": 1.0 },
+        { "range": [51, 80], "direction": ["vertical", "horizontal"], "speed": 1.8 },
+        { "range": [81, 100], "direction": ["vertical", "horizontal"], "speed": 2.5 }
+      ]
     },
     {
       "name": "fade",
       "enabled": true,
-      "speed": "progressive"
+      "difficultyRanges": [
+        { "range": [20, 50], "speed": 0.5, "frequency": 2.0, "affectedTiles": 2 },
+        { "range": [51, 80], "speed": 1.2, "frequency": 3.5, "affectedTiles": 4 },
+        { "range": [81, 100], "speed": 2.0, "frequency": 5.0, "affectedTiles": 6 }
+      ]
     },
     {
       "name": "rotation",
       "enabled": true,
-      "angle": [90, 180],
-      "speed": "progressive"
+      "difficultyRanges": [
+        { "range": [20, 50], "angle": [90], "speed": 1.0, "affectedTiles": 2 },
+        { "range": [51, 80], "angle": [90, 180], "speed": 1.8, "affectedTiles": 4 },
+        { "range": [81, 100], "angle": [180, 270], "speed": 2.5, "affectedTiles": 6 }
+      ]
     },
     {
       "name": "mirror",
       "enabled": true,
-      "direction": ["horizontal", "vertical"],
-      "duration": "progressive"
+      "difficultyRanges": [
+        { "range": [20, 50], "direction": ["horizontal"], "duration": 2500 },
+        { "range": [51, 80], "direction": ["horizontal", "vertical"], "duration": 1500 },
+        { "range": [81, 100], "direction": ["horizontal", "vertical"], "duration": 800, "frequency": 2 }
+      ]
     },
     {
       "name": "size",
       "enabled": true,
-      "range": [0.8, 1.2],
-      "speed": "progressive"
+      "difficultyRanges": [
+        { "range": [20, 50], "sizeRange": [0.9, 1.1], "speed": 1.0, "affectedTiles": 2 },
+        { "range": [51, 80], "sizeRange": [0.8, 1.2], "speed": 1.8, "affectedTiles": 4 },
+        { "range": [81, 100], "sizeRange": [0.6, 1.4], "speed": 2.5, "affectedTiles": 6 }
+      ]
     },
     {
       "name": "shadow",
       "enabled": true,
-      "intensity": "progressive"
+      "difficultyRanges": [
+        { "range": [20, 50], "blurIntensity": 2, "affectedTiles": 2 },
+        { "range": [51, 80], "blurIntensity": 5, "affectedTiles": 5 },
+        { "range": [81, 100], "blurIntensity": 8, "affectedTiles": 8 }
+      ]
     }
   ]
 }
@@ -364,11 +445,14 @@
 
 #### 기믹 설정
 - **enabled**: 기믹 시스템 활성화 여부
-- **startLevel**: 기믹이 시작되는 레벨 (기본값: 10)
+- **startLevel**: 기믹이 시작되는 레벨 (기본값: 20)
 - **probability**: 기믹 발생 확률 (0.0 ~ 1.0, 기본값: 0.3)
+- **singleActive**: 한번에 하나의 기믹만 활성화 여부 (기본값: true)
 - **gimmicks[].enabled**: 개별 기믹 활성화 여부
 - **gimmicks[].interval**: 기믹 발생 주기 (초 단위)
-- **gimmicks[].intensity/speed/duration**: "progressive"로 설정 시 레벨에 따라 점진적으로 증가
+- **gimmicks[].difficultyRanges**: 레벨 구간별 난이도 설정 배열
+  - **range**: 레벨 범위 [시작, 끝]
+  - 각 기믹별로 고유한 난이도 파라미터 설정 가능 (intensity, count, speed, angle, duration 등)
 
 #### 보스 설정
 - **enabled**: 보스 시스템 활성화 여부
@@ -403,7 +487,8 @@
 
 #### 기믹 시스템
 - 기믹은 레벨에 따라 확률적으로 발생 (`config.gimmicks.probability`)
-- 여러 기믹이 동시에 발생할 수 있음
+- `config.gimmicks.singleActive`가 true일 경우 한번에 하나의 기믹만 활성화
+- 각 기믹은 `difficultyRanges` 배열을 통해 레벨 구간별 난이도 설정 가능
 - 기믹 발생 시 시각적/청각적 피드백 제공
 - 기믹이 게임의 핵심 메커니즘(색상 구분)을 방해하지 않도록 주의
 
