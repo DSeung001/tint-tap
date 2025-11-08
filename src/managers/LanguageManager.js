@@ -69,6 +69,79 @@ export class LanguageManager {
   addLanguage(langCode, translations) {
     this.translations[langCode] = translations;
   }
+  
+  /**
+   * 현재 메시지가 특정 키의 번역인지 확인
+   */
+  isMessageType(text, key) {
+    if (!text || !key) return false;
+    const currentTranslation = this.t(key);
+    const allTranslations = Object.values(this.translations).map(t => t[key]).filter(Boolean);
+    return allTranslations.some(translation => text.includes(translation) || translation.includes(text));
+  }
+  
+  /**
+   * 메시지에서 점수 정보 추출 및 재포맷팅
+   */
+  formatCorrectMessage(baseScore, oddBonus, timeBonus) {
+    return `${this.t('correctAnswer')} +${baseScore} / +${oddBonus} / +${timeBonus} ${this.t('scoreGained')}`;
+  }
+  
+  /**
+   * 메시지에서 목숨 정보 추출 및 재포맷팅
+   */
+  formatWrongMessage(lives) {
+    return `${this.t('wrongAnswer')} ${this.t('remainingLives')} ${lives}${this.t('livesUnit')}. ${this.t('tryAgain')}`;
+  }
+  
+  /**
+   * 현재 메시지 타입 판단 및 번역된 메시지 반환
+   * @param {string} currentText - 현재 메시지 텍스트
+   * @param {object} context - 컨텍스트 정보 (lives, scores 등)
+   * @returns {string|null} - 번역된 메시지 또는 null
+   */
+  translateMessage(currentText, context = {}) {
+    if (!currentText) return null;
+    
+    // 정답 메시지 확인
+    if (this.isMessageType(currentText, 'correctAnswer')) {
+      const scoreMatch = currentText.match(/(\+?\d+)\s*\/\s*(\+?\d+)\s*\/\s*(\+?\d+)/);
+      if (scoreMatch) {
+        return this.formatCorrectMessage(scoreMatch[1], scoreMatch[2], scoreMatch[3]);
+      }
+      return this.t('correctAnswer');
+    }
+    
+    // 오답 메시지 확인
+    if (this.isMessageType(currentText, 'wrongAnswer')) {
+      if (context.lives !== undefined) {
+        return this.formatWrongMessage(context.lives);
+      }
+      return this.t('wrongAnswer');
+    }
+    
+    // 선택 없음 메시지 확인
+    if (this.isMessageType(currentText, 'noSelectionMessage')) {
+      return this.t('noSelectionMessage');
+    }
+    
+    // 게임 시작 메시지 확인
+    if (this.isMessageType(currentText, 'gameStartMessage')) {
+      return this.t('gameStartMessage');
+    }
+    
+    // 환영 메시지 확인
+    if (this.isMessageType(currentText, 'welcomeMessage')) {
+      return this.t('welcomeMessage');
+    }
+    
+    // 승리 메시지 확인
+    if (this.isMessageType(currentText, 'winMessage')) {
+      return this.t('winMessage');
+    }
+    
+    return null;
+  }
 }
 
 // 싱글톤 인스턴스
