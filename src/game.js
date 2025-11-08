@@ -29,6 +29,9 @@ export class TintTapGame {
     this.bindUi();
     this.initializeManagers();
     this.updateStaticTexts();
+    this.updateLanguageButton();
+    this.updateMuteButton();
+    this.updateHudLabels();
     this.showStartScreen();
     this.updateHud();
   }
@@ -63,7 +66,9 @@ export class TintTapGame {
       timerDisplay: document.getElementById('timer-display'),
       bestDisplay: document.getElementById('best-display'),
       finalScore: document.getElementById('final-score'),
-      highScore: document.getElementById('high-score')
+      highScore: document.getElementById('high-score'),
+      languageToggle: document.getElementById('language-toggle'),
+      muteToggle: document.getElementById('mute-toggle')
     };
   }
 
@@ -94,6 +99,118 @@ export class TintTapGame {
       this.audioManager?.play('buttonClick');
       this.commitSelection();
     });
+
+    // 언어 토글 버튼 이벤트
+    if (this.dom.languageToggle) {
+      this.updateLanguageButton();
+      this.dom.languageToggle.addEventListener('click', () => {
+        this.audioManager?.play('buttonClick');
+        const newLang = languageManager.toggleLanguage();
+        this.updateLanguageButton();
+        this.updateAllTexts();
+      });
+    }
+
+    // 음소거 토글 버튼 이벤트
+    if (this.dom.muteToggle) {
+      this.updateMuteButton();
+      this.dom.muteToggle.addEventListener('click', () => {
+        const isEnabled = this.audioManager?.toggleMute();
+        this.updateMuteButton();
+        // 음소거 상태 변경 시에도 효과음 재생하지 않음
+      });
+    }
+  }
+  
+  updateLanguageButton() {
+    if (this.dom.languageToggle) {
+      const currentLang = languageManager.getCurrentLanguage();
+      this.dom.languageToggle.textContent = currentLang === 'ko' ? 'KOR' : 'ENG';
+    }
+  }
+  
+  updateMuteButton() {
+    if (this.dom.muteToggle) {
+      const isMuted = this.audioManager?.isMuted();
+      this.dom.muteToggle.textContent = isMuted ? '🔇' : '🔊';
+      if (isMuted) {
+        this.dom.muteToggle.classList.add('muted');
+      } else {
+        this.dom.muteToggle.classList.remove('muted');
+      }
+    }
+  }
+  
+  updateAllTexts() {
+    // 모든 텍스트를 현재 언어로 업데이트
+    this.updateStaticTexts();
+    
+    // 게임 오버 화면 업데이트
+    if (this.dom.gameOverScreen && !this.dom.gameOverScreen.classList.contains('hidden')) {
+      const title = this.dom.gameOverScreen.querySelector('h2');
+      if (title) {
+        const isClear = title.textContent === languageManager.t('allClear') || 
+                       title.textContent === 'All Clear!';
+        title.textContent = isClear ? languageManager.t('allClear') : languageManager.t('gameOver');
+      }
+      this.hudManager.updateGameOver(this.score, this.bestScore);
+    }
+    
+    // 메시지 업데이트
+    if (this.dom.startScreen && !this.dom.startScreen.classList.contains('hidden')) {
+      this.dom.message.textContent = languageManager.t('welcomeMessage');
+    } else if (this.dom.message && !this.dom.gameOverScreen?.classList.contains('hidden') === false) {
+      // 게임 중 메시지도 현재 언어로 업데이트
+      const currentText = this.dom.message.textContent;
+      
+      // 정답 메시지 업데이트
+      if (currentText.includes('정답!') || currentText.includes('Correct!') || 
+          currentText.startsWith('정답!') || currentText.startsWith('Correct!')) {
+        // 점수 정보가 포함된 메시지인 경우
+        const scoreMatch = currentText.match(/(\+?\d+)\s*\/\s*(\+?\d+)\s*\/\s*(\+?\d+)/);
+        if (scoreMatch) {
+          this.dom.message.textContent = `${languageManager.t('correctAnswer')} +${scoreMatch[1]} / +${scoreMatch[2]} / +${scoreMatch[3]} ${languageManager.t('scoreGained')}`;
+        } else {
+          this.dom.message.textContent = languageManager.t('correctAnswer');
+        }
+      }
+      // 오답 메시지 업데이트
+      else if (currentText.includes('오답!') || currentText.includes('Wrong!') ||
+               currentText.startsWith('오답!') || currentText.startsWith('Wrong!')) {
+        const livesMatch = currentText.match(/(\d+)/);
+        if (livesMatch && this.lives !== undefined) {
+          this.dom.message.textContent = `${languageManager.t('wrongAnswer')} ${languageManager.t('remainingLives')} ${this.lives}${languageManager.t('livesUnit')}. ${languageManager.t('tryAgain')}`;
+        } else {
+          this.dom.message.textContent = languageManager.t('wrongAnswer');
+        }
+      }
+      // 선택 없음 메시지 업데이트
+      else if (currentText.includes('선택된 타일이 없습니다') || 
+               currentText.includes('No tiles selected')) {
+        this.dom.message.textContent = languageManager.t('noSelectionMessage');
+      }
+      // 게임 시작 메시지 업데이트
+      else if (currentText.includes('다른 색을 가진 타일을 모두 선택하세요') ||
+               currentText.includes('Select all tiles with different colors')) {
+        this.dom.message.textContent = languageManager.t('gameStartMessage');
+      }
+      // 환영 메시지 업데이트
+      else if (currentText.includes('환영합니다') || 
+               currentText.includes('Welcome to Tint Tap')) {
+        this.dom.message.textContent = languageManager.t('welcomeMessage');
+      }
+    }
+    
+    // HUD 레이블 업데이트 - HUDManager의 메서드 사용
+    if (this.hudManager) {
+      this.hudManager.updateLabels();
+      // DOM 참조 업데이트
+      this.dom.levelDisplay = document.getElementById('level-display');
+      this.dom.scoreDisplay = document.getElementById('score-display');
+      this.dom.livesDisplay = document.getElementById('lives-display');
+      this.dom.timerDisplay = document.getElementById('timer-display');
+      this.dom.bestDisplay = document.getElementById('best-display');
+    }
   }
 
   updateStaticTexts() {

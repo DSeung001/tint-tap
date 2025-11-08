@@ -1,10 +1,15 @@
 import { ko } from '../locales/ko.js';
+import { en } from '../locales/en.js';
+import { StorageManager } from './StorageManager.js';
 
 export class LanguageManager {
   constructor() {
-    this.currentLanguage = 'ko';
+    // 저장된 언어 설정 불러오기
+    const savedLang = StorageManager.loadLanguage();
+    this.currentLanguage = savedLang;
     this.translations = {
-      ko: ko
+      ko: ko,
+      en: en
     };
   }
 
@@ -12,9 +17,18 @@ export class LanguageManager {
   setLanguage(lang) {
     if (this.translations[lang]) {
       this.currentLanguage = lang;
+      // 언어 설정 저장
+      StorageManager.saveLanguage(lang);
       return true;
     }
     return false;
+  }
+  
+  // 언어 토글 (ko <-> en)
+  toggleLanguage() {
+    const newLang = this.currentLanguage === 'ko' ? 'en' : 'ko';
+    this.setLanguage(newLang);
+    return newLang;
   }
 
   // 번역 가져오기

@@ -18,6 +18,8 @@ export class AudioManager {
     
     // BGM 인스턴스 추적
     this.currentBgm = null;
+    // 음소거 전 재생 중이었던 BGM 저장
+    this.pausedBgm = null;
   }
 
   /**
@@ -138,11 +140,15 @@ export class AudioManager {
    */
   playBGM(name) {
     if (!this.enabled) {
+      // 음소거 상태면 일시정지된 BGM으로 저장
+      this.pausedBgm = name;
       return;
     }
 
     // 현재 재생 중인 BGM 정지
     this.stopBGM();
+    // 새로운 BGM 재생 시 일시정지된 BGM 초기화
+    this.pausedBgm = null;
 
     const bgm = this.bgmInstances[name];
     if (!bgm) {
@@ -175,6 +181,41 @@ export class AudioManager {
       }
     }
     this.currentBgm = null;
+  }
+  
+  /**
+   * 현재 재생 중인 BGM을 일시정지합니다 (음소거용)
+   */
+  pauseBGM() {
+    if (this.currentBgm && this.bgmInstances[this.currentBgm]) {
+      try {
+        this.bgmInstances[this.currentBgm].pause();
+        // 음소거 전 BGM 저장 (재생 위치는 유지)
+        this.pausedBgm = this.currentBgm;
+      } catch (error) {
+        console.warn(`BGM 일시정지 중 오류: ${this.currentBgm}`, error);
+      }
+    }
+  }
+  
+  /**
+   * 일시정지된 BGM을 다시 재생합니다
+   */
+  resumeBGM() {
+    if (this.pausedBgm && this.bgmInstances[this.pausedBgm]) {
+      try {
+        const bgm = this.bgmInstances[this.pausedBgm];
+        bgm.play().catch((error) => {
+          if (error.name !== 'NotAllowedError') {
+            console.warn(`BGM 재생 실패: ${this.pausedBgm}`, error);
+          }
+        });
+        this.currentBgm = this.pausedBgm;
+        this.pausedBgm = null;
+      } catch (error) {
+        console.warn(`BGM 재개 중 오류: ${this.pausedBgm}`, error);
+      }
+    }
   }
 
   /**
@@ -228,6 +269,31 @@ export class AudioManager {
     if (!enabled) {
       this.stopBGM();
     }
+  }
+  
+  /**
+   * 음소거 상태를 토글합니다
+   */
+  toggleMute() {
+    const wasMuted = !this.enabled;
+    this.enabled = !this.enabled;
+    
+    if (!this.enabled) {
+      // 음소거: 현재 재생 중인 BGM 일시정지
+      this.pauseBGM();
+    } else {
+      // 음소거 해제: 이전에 재생 중이었던 BGM 재개
+      this.resumeBGM();
+    }
+    
+    return this.enabled;
+  }
+  
+  /**
+   * 음소거 상태를 가져옵니다
+   */
+  isMuted() {
+    return !this.enabled;
   }
 }
 

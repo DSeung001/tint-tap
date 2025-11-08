@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'tint-tap-best-score';
+const LANGUAGE_KEY = 'tint-tap-language';
 
 export class StorageManager {
   static loadBestScore() {
@@ -13,6 +14,14 @@ export class StorageManager {
       return newBestScore;
     }
     return bestScore;
+  }
+  
+  static saveLanguage(lang) {
+    localStorage.setItem(LANGUAGE_KEY, lang);
+  }
+  
+  static loadLanguage() {
+    return localStorage.getItem(LANGUAGE_KEY) || 'ko';
   }
 }
 

@@ -2,7 +2,7 @@
 export const ko = {
   // 게임 타이틀
   gameTitle: 'Tint Tap',
-  tagline: '신중하게 다른 색을 찾아라!',
+  tagline: '다른 색을 찾아라!',
   
   // 시작 화면
   welcomeMessage: '레트로 감성 컬러 퍼즐, Tint Tap에 오신 것을 환영합니다!',

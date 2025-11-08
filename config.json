@@ -18,13 +18,13 @@
     { "range": [1, 10], "start": 110, "end": 95, "easing": "linear" },
     { "range": [11, 20], "start": 95, "end": 75, "easing": "linear" },
     { "range": [21, 30], "start": 75, "end": 55, "easing": "linear" },
-    { "range": [31, 40], "start": 55, "end": 40, "easing": "linear" },
-    { "range": [41, 50], "start": 40, "end": 30, "easing": "linear" },
-    { "range": [51, 60], "start": 30, "end": 22, "easing": "linear" },
-    { "range": [61, 70], "start": 22, "end": 16, "easing": "linear" },
-    { "range": [71, 80], "start": 16, "end": 12, "easing": "linear" },
-    { "range": [81, 90], "start": 12, "end": 8, "easing": "linear" },
-    { "range": [91, 100], "start": 8, "end": 5, "easing": "linear" }
+    { "range": [31, 40], "start": 55, "end": 45, "easing": "linear" },
+    { "range": [41, 50], "start": 45, "end": 40, "easing": "linear" },
+    { "range": [51, 60], "start": 40, "end": 35, "easing": "linear" },
+    { "range": [61, 70], "start": 35, "end": 30, "easing": "linear" },
+    { "range": [71, 80], "start": 30, "end": 25, "easing": "linear" },
+    { "range": [81, 90], "start": 25, "end": 23, "easing": "linear" },
+    { "range": [91, 100], "start": 23, "end": 20, "easing": "linear" }
   ],
   "oddTileSchedule": [
     { "range": [1, 15], "count": 1 },

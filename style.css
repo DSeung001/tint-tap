@@ -390,3 +390,60 @@ body {
     min-width: 140px;
   }
 }
+
+/* 설정 버튼 스타일 */
+.settings-buttons {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.settings-button {
+  background: rgba(10, 15, 30, 0.9);
+  border: 2px solid var(--accent);
+  color: var(--text);
+  font-family: var(--retro-font);
+  font-size: 0.7rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-button:hover {
+  background: rgba(255, 111, 97, 0.2);
+  border-color: var(--accent-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 111, 97, 0.3);
+}
+
+.settings-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 111, 97, 0.2);
+}
+
+.settings-button.muted {
+  opacity: 0.6;
+}
+
+@media (max-width: 700px) {
+  .settings-buttons {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .settings-button {
+    font-size: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    min-width: 45px;
+  }
+}
