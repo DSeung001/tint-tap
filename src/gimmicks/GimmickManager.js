@@ -124,6 +124,11 @@ export class GimmickManager {
       this.game.bossCharacter.show();
     }
 
+    // 레벨이 변경되면 이전 기믹 비활성화
+    if (this.activeGimmick) {
+      this.deactivateGimmick(this.activeGimmick.name);
+    }
+
     // 보스 시작 레벨 이후에는 매번 기믹 발생
     if (level >= bossStartLevel) {
       this.triggerRandomGimmick();
@@ -139,13 +144,9 @@ export class GimmickManager {
    * 랜덤 기믹 발생
    */
   triggerRandomGimmick() {
-    if (this.singleActive && this.activeGimmick) {
-      // 이미 활성화된 기믹이 있으면 새로운 기믹 발생하지 않음
-      return;
-    }
-
+    // 활성화 가능한 모든 기믹 가져오기 (활성화 여부와 관계없이)
     const availableGimmicks = Array.from(this.gimmicks.values())
-      .filter(g => !g.active && g.enabled);
+      .filter(g => g.enabled);
     
     if (availableGimmicks.length === 0) return;
 
