@@ -105,6 +105,15 @@
           { "range": [41, 70], "intensity": "medium", "interval": 10 },
           { "range": [71, 100], "intensity": "hard", "interval": 7 }
         ]
+      },
+      {
+        "name": "hide",
+        "enabled": true,
+        "difficultyRanges": [
+          { "range": [20, 40], "count": [1, 2], "interval": 4 },
+          { "range": [41, 70], "count": [2, 4], "interval": 3 },
+          { "range": [71, 100], "count": [3, 6], "interval": 2 }
+        ]
       }
     ]
   },

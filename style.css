@@ -230,6 +230,13 @@ body {
   box-shadow: 0 0 0 3px var(--tile-selected);
 }
 
+/* 기믹: 타일 숨기기 */
+.tile.gimmick-hidden {
+  opacity: 0;
+  pointer-events: auto; /* 클릭은 여전히 가능 */
+  transition: opacity 0.3s ease-in-out;
+}
+
 .controls {
   display: flex;
   justify-content: center;
