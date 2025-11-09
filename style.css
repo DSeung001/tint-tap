@@ -237,6 +237,11 @@ body {
   transition: opacity 0.3s ease-in-out;
 }
 
+/* 기믹: 그리드 회전 */
+.tile-grid.gimmick-rotated {
+  transform-origin: center center;
+}
+
 .controls {
   display: flex;
   justify-content: center;

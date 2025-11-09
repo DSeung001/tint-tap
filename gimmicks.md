@@ -167,9 +167,9 @@
   "name": "rotation",
   "enabled": true,
   "difficultyRanges": [
-    { "range": [20, 50], "angle": [90], "speed": 1.0, "affectedTiles": 2 },
-    { "range": [51, 80], "angle": [90, 180], "speed": 1.8, "affectedTiles": 4 },
-    { "range": [81, 100], "angle": [180, 270], "speed": 2.5, "affectedTiles": 6 }
+    { "range": [20, 50], "angle": [90, 180, 270], "speed": 1.0 },
+    { "range": [51, 80], "angle": [90, 180, 270], "speed": 1.8 },
+    { "range": [81, 100], "angle": [90, 180, 270], "speed": 2.5 }
   ]
 }
 ```

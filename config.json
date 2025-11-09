@@ -114,6 +114,15 @@
           { "range": [41, 70], "count": [2, 4], "interval": 3 },
           { "range": [71, 100], "count": [3, 6], "interval": 2 }
         ]
+      },
+      {
+        "name": "rotation",
+        "enabled": true,
+        "difficultyRanges": [
+          { "range": [20, 50], "angle": [90, 180, 270], "speed": 1.0 },
+          { "range": [51, 80], "angle": [90, 180, 270], "speed": 1.8 },
+          { "range": [81, 100], "angle": [90, 180, 270], "speed": 2.5 }
+        ]
       }
     ]
   },

@@ -1,5 +1,6 @@
 import { ShuffleGimmick } from './gimmicks/ShuffleGimmick.js';
 import { HideGimmick } from './gimmicks/HideGimmick.js';
+import { RotationGimmick } from './gimmicks/RotationGimmick.js';
 // 다른 기믹들도 여기에 import
 
 /**
@@ -17,6 +18,7 @@ class GimmickRegistry {
   registerDefaultGimmicks() {
     this.register('shuffle', ShuffleGimmick);
     this.register('hide', HideGimmick);
+    this.register('rotation', RotationGimmick);
     // 새로운 기믹 추가 시 여기에 등록
     // this.register('flow', FlowGimmick);
   }
