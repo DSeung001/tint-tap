@@ -242,6 +242,12 @@ body {
   transform-origin: center center;
 }
 
+/* 기믹: 그리드 반전 */
+.tile-grid.gimmick-mirror-horizontal,
+.tile-grid.gimmick-mirror-vertical {
+  transform-origin: center center;
+}
+
 .controls {
   display: flex;
   justify-content: center;

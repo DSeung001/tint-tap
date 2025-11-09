@@ -94,7 +94,7 @@
   "gimmicks": {
     "enabled": true,
     "startLevel": 20,
-    "probability": 0.3,
+    "probability": 0.4,
     "singleActive": true,
     "gimmicks": [
       {
@@ -122,6 +122,15 @@
           { "range": [20, 50], "angle": [90, 180, 270], "speed": 1.0 },
           { "range": [51, 80], "angle": [90, 180, 270], "speed": 1.8 },
           { "range": [81, 100], "angle": [90, 180, 270], "speed": 2.5 }
+        ]
+      },
+      {
+        "name": "mirror",
+        "enabled": true,
+        "difficultyRanges": [
+          { "range": [20, 50], "direction": ["horizontal"], "duration": 2500 },
+          { "range": [51, 80], "direction": ["horizontal", "vertical"], "duration": 1500 },
+          { "range": [81, 100], "direction": ["horizontal", "vertical"], "duration": 800, "frequency": 2 }
         ]
       }
     ]
